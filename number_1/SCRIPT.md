@@ -32,3 +32,4 @@
  Com esses dados criamos uma simulação e comparamos os resultados para mostrar como poderia ser um modelo alternativo: 
 
 * criar simulação e animação com base no gráfico  https://observablehq.com/@d3/animated-treemap
+https://developers.google.com/chart/interactive/docs/gallery/treemap#overview

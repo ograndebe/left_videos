@@ -65,15 +65,19 @@ type EstruturaCargo = {
 
 class Empresa {
     receitaAtual: number;
-    taxaCrescimento: number;
+    taxaCrescimentoReceita: number;
+    taxaCrescimentoGapReceita: number;
     estruturaCargos: Map<TipoCargo, EstruturaCargo>;
     totalAtualFuncionarios: number;
     contaCorrente: number;
     ceo: Pessoa;
+    maximoPermitidoGastoEmFolha: number;
     constructor(readonly sociedade: Sociedade) {
         this.ceo = sociedade.pessoasDesempregadas.shift() as Pessoa;
         this.receitaAtual = 90000;
-        this.taxaCrescimento = 5;
+        this.maximoPermitidoGastoEmFolha = this.receitaAtual;
+        this.taxaCrescimentoReceita = 5;
+        this.taxaCrescimentoGapReceita = 4.5;
         this.totalAtualFuncionarios = 1;
         this.contaCorrente = 0;
         this.estruturaCargos = new Map<TipoCargo, EstruturaCargo>([
@@ -100,7 +104,8 @@ class Empresa {
         const totalPago = this.pagarSalarios();
         this.contaCorrente -= totalPago;
         this.contratarSeNecessario();
-        this.receitaAtual += (this.receitaAtual * this.taxaCrescimento)/100;
+        this.receitaAtual += (this.receitaAtual * this.taxaCrescimentoReceita)/100;
+        this.maximoPermitidoGastoEmFolha += (this.maximoPermitidoGastoEmFolha* this.taxaCrescimentoGapReceita)/100;
     }
     pagarSalarios() : number{
         let totalPago = 0;
@@ -120,9 +125,9 @@ class Empresa {
         this.contratarCargo(TipoCargo.JUNIOR);
     }
     private contratarCargo(cargo: TipoCargo) {
-
         const custoFolha = this.calcularCustoFolhaPagamento();
-        const sobraMensal = Math.max(this.receitaAtual - custoFolha, 0);
+
+        const sobraMensal = Math.max(this.maximoPermitidoGastoEmFolha - custoFolha, 0);
         if (sobraMensal > 0) {
             const quantosNesseCargo = this.calcularQuantosDevoContratar(cargo, sobraMensal);
             if (quantosNesseCargo > 0)  {
@@ -137,9 +142,8 @@ class Empresa {
         
             }
         }
-
-
     }
+
     private calcularQuantosDevoContratar(cargo: TipoCargo, sobraMensal: number): number {
         const estrutura = this.estruturaCargos.get(cargo);
         if (estrutura) {
@@ -210,7 +214,7 @@ export class ModeloPadrao implements Modelo {
 
     proximoMes(ano: number, mes: number) {
         if (mes == 12) {
-            console.log(`Modelo Padrão: ano ${ano} mes ${mes} funcionarios: ${this.empresa.totalAtualFuncionarios} receita: ${this.empresa.receitaAtual}`);
+            console.log(`${ano}/${mes} funcionarios: ${this.empresa.totalAtualFuncionarios} receita: ${this.empresa.receitaAtual.toFixed(2)} CC: ${this.empresa.contaCorrente.toFixed(2)}`);
             // console.log(this.empresa.estruturaCargos);
         }
         this.empresa.proximoMes();
